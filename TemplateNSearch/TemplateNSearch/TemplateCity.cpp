@@ -3,38 +3,46 @@
 #include <iostream>
 #include "TemplateCity.h"
 #include "unit.hpp"
+#include <vld.h>
 TemplateCity::TemplateCity(){
-	Initialize();
+	listInitialized = false;
+	treeInitialized = false;
 }
 TemplateCity::~TemplateCity(){
-	newList->CleanList();
-	delete newList;
-	newList = nullptr;
-
-	newBinaryTree->ClearTree();
-	delete newBinaryTree;
-	newBinaryTree = nullptr;
+	if (listInitialized){
+		newList->CleanList();
+		delete newList;
+		newList = nullptr;
+	}
+	if (treeInitialized){
+		newBinaryTree->ClearTree();
+		delete newBinaryTree;
+		newBinaryTree = nullptr;
+	}
 }
 bool TemplateCity::Initialize(){
-	
+	m_running = false;
+	if (m_running == false){
+		InitializeList();
+		InitializeBinaryTree();
+	}
 	m_running = true;
-	InitializeList();
-	InitializeBinaryTree();
 	return true;
 }
 void TemplateCity::Update(){
 	while (m_running){
-			//ListManipulation<int>();
-			BinaryTreeManipulation<int>();
+			ListManipulation<int>();
+			//BinaryTreeManipulation<int>();
 		}
 }
 void TemplateCity::InitializeList()
 {
 	newList = new TList <int>();
+	listInitialized = true;
 }
 void TemplateCity::InitializeBinaryTree(){
 	newBinaryTree = new TBinaryTree<int>();
+	treeInitialized = true;
 }
 
-//popfront- popback tabort, clear remove all, find value i list, size length of list. 
 

@@ -17,25 +17,30 @@ template<class T>
 struct TList
 {
 	TNode<T>* headNode;
+	TNode<T>* tempNode;
 	void PushBack(T value)
 	{
-		
 		if (IsListEmpty(value)){
-
+			std::cout << "Pushbacking with value" << value << "as headnode" << std::endl;
 		}
 		else
 		{
-			TNode<T>* tempNode = headNode;
-			while (tempNode->nextNode!=nullptr){
-				tempNode = tempNode->nextNode;
-			}
-			
-			TNode<T> *newNode = new TNode < T > ;
-			newNode->value = value;
-			newNode->nextNode = nullptr;
-			tempNode->nextNode = newNode;
-			verify(value, newNode->value, "Pushback");
+			tempNode = headNode;
+			for (tempNode = headNode; tempNode->nextNode; tempNode = tempNode->nextNode);
+			tempNode->nextNode = new TNode < T >;
+			tempNode->nextNode->value = value;
+			tempNode->nextNode->nextNode = nullptr;
+			std::cout << "Pushbacking with value" << value << std::endl;
+			//verify(value, newNode->value, "Pushback");
 		}
+	}
+	void UnitTest(){
+		PushBack(5);
+		PushFront(5);
+		verify(2, Size(), "Veryfying list size is 2");
+		PopFront();
+		PopBack();
+		verify(0, Size(), "Veryfying list size is 0");
 	}
 	void PushFront(T value){
 		if (IsListEmpty(value))
@@ -43,11 +48,13 @@ struct TList
 
 		}
 		else{
-			TNode<T> *newNode = new TNode<T>;
-			newNode->value = value;
-			newNode->nextNode = headNode;
-			headNode = newNode;
-			verify(value, newNode->value, "PushFront");
+			tempNode = new TNode<T>();
+			tempNode->value = value;
+			tempNode->nextNode = headNode;
+			headNode = tempNode;
+			//headNode->nextNode = nullptr;
+			//verify(value, tempNode->value, "PushFront");
+			//delete newNode;
 		}
 	}
 	void PopFront(){
@@ -55,34 +62,28 @@ struct TList
 			std::cout << "Head node is null, failed to popFront";
 		}
 		else{
-			TNode<T> * tempnext = headNode->nextNode;
-			headNode = nullptr;
+			TNode<T>* tempNode;
+			tempNode = headNode->nextNode;
 			delete headNode;
 			headNode = nullptr;
-			headNode = tempnext;
+			headNode = tempNode;
 		}	
 	}
 	void PopBack(){
-		if (!headNode){
-			std::cout << "Head node is null, failed to popback";
-		}
+		if (!headNode)
+			std::cout << "list empty " << std::endl;
 		else{
-			if (headNode->nextNode == nullptr){
-				headNode = nullptr;
+			if (headNode->nextNode){
+				tempNode = headNode;
+				for (; tempNode->nextNode->nextNode; tempNode = tempNode->nextNode);
+				delete tempNode->nextNode;
+				tempNode->nextNode = nullptr;
+			}
+			else{
 				delete headNode;
 				headNode = nullptr;
 			}
-			else{
-				TNode<T>* tempNode = nullptr;
-				tempNode= headNode;
-					while (tempNode->nextNode->nextNode != nullptr){
-						tempNode = tempNode->nextNode;
-					}
-						tempNode->nextNode = nullptr;
-						delete tempNode->nextNode;
-						tempNode->nextNode = nullptr;
-				}
-			}
+		}
 		}
 
 	T Size(){
@@ -98,7 +99,7 @@ struct TList
 		std::cout << sizeValue <<" size of list"<<std::endl;
 		return sizeValue;
 	}
-	TNode<T>* First(){
+	/*TNode<T>* First(){
 		if (headNode != nullptr){
 			return headNode;
 		}
@@ -116,9 +117,9 @@ struct TList
 			}
 		}
 
-	}
+	}*/
 	void CleanList(){
-		if (!headNode){
+		if (headNode==nullptr){
 			std::cout << "List Should Already Be Empty\n<<<<<<<<<<<<<";
 		}
 		else{
@@ -146,8 +147,7 @@ struct TList
 	}
 	bool IsListEmpty(T value){
 		if (headNode==nullptr){
-			TNode<int> *newNode = new TNode < T > ;
-			headNode = newNode;
+			headNode = new TNode < T >;
 			headNode->nextNode = nullptr;
 			headNode->value = value;
 			return true;
@@ -166,7 +166,7 @@ struct TList
 template<class T>
 struct TBinaryTree
 {
-	TDuoNode<T>* headNode = new TDuoNode<T>();;
+	TDuoNode<T>* headNode;
 	template <class T>
 	TDuoNode<T>* CreateNode(T value){
 		TDuoNode<T>* newNode=new TDuoNode<T>();
@@ -175,7 +175,7 @@ struct TBinaryTree
 		newNode->value = value;
 		return newNode;
 	}
-	void AddNodeLocal(int key, TDuoNode<T> *node){
+	void AddNodeLocal(T key, TDuoNode<T> *node){
 		if (headNode == NULL){
 			headNode = CreateNode(key);
 		}
@@ -205,9 +205,16 @@ struct TBinaryTree
 			std::cout << "Key Value of" << key << "is already inserted" << std::endl;
 		}
 	}
-	void AddNode(int key){
-		AddNodeLocal(key, headNode);
-		std::cout << "Pushbacking " << key << " into tree" << std::endl;
+	void AddNode(T key){
+		if (headNode == nullptr){
+			headNode = CreateNode(key);
+			std::cout << "Pushbacking " << key << " into tree, as headnode" << std::endl;
+		}
+		else{
+			AddNodeLocal(key, headNode);
+			std::cout << "Pushbacking " << key << " into tree" << std::endl;
+		}
+	
 	}
 	void Find(T value){
 		if (headNode == nullptr){
@@ -272,10 +279,14 @@ struct TBinaryTree
 		}
 		
 	}
-	void Size(){
+	int Size(){
 		int size=0;
 		LocalGetSize(headNode,size);
-		std::cout << size;
+		//std::cout << size;
+		if (headNode != nullptr){  //<<------ fix size shiz
+			return size+1;
+		}
+		return size;
 	}
 	void LocalGetSize(TDuoNode<T>*node,int &size){
 		if (headNode != nullptr){
@@ -287,7 +298,6 @@ struct TBinaryTree
 			if (node->nodeHigh != nullptr){
 				LocalGetSize(node->nodeHigh,size);
 				size++;
-		
 			}
 		}
 		else{
@@ -303,6 +313,7 @@ struct TBinaryTree
 		if (headNode != nullptr){
 			if (node->nodeLow != nullptr){
 				TraverseInOrderLocal(node->nodeLow);
+				
 			}
 			std::cout << node->value << " ";
 			if (node->nodeHigh != nullptr){
@@ -361,7 +372,7 @@ public:
 	bool Initialize();
 	template <class T>
 	void ListManipulation(){
-		std::cout << "\n 1:PushBack\n 2:PushFront\n 3:PopFront\n 4:PopBack \n 5:Clean\n 7:Find Value\n 8:Size of list";
+		std::cout << "\n 1:PushBack\n 2:PushFront\n 3:PopFront\n 4:PopBack \n 5:Clean\n 6:Close Program\n 7:Find Value\n 8:Size of list\n 9:UnitTest\n ";
 		T input = std::cin.get();
 		switch (input){
 		case '1':
@@ -384,7 +395,7 @@ public:
 			newList->CleanList();
 			break;
 		case '6':
-	
+			m_running = false;
 			break;
 		case '7':
 			std::cout << "\nWrite Which Number You are looking for\n";
@@ -393,12 +404,15 @@ public:
 		case '8':
 			 newList->Size();
 			break;
+		case '9':
+			newList->UnitTest();
+			break;
 		}
 		//system("pause");
 	}
 	template <class T>
 	void BinaryTreeManipulation(){
-		std::cout << "\n 1:AddLeaf/Node(Which node value is in the syntax)\n2:PrintInOrder\n3:PrintReverseOrder\n 4:FindValue(which number is in the syntax :( )\n 5:Size of Tree\n";
+		std::cout << "\n 1:AddLeaf/Node(Which node value is in the syntax)\n2:PrintInOrder\n3:PrintReverseOrder\n 4:FindValue(which number is in the syntax :( )\n 5:Size of Tree\n 6: Close program\n 7: Unit Testing\n";
 		T input = std::cin.get();
 		switch (input){
 		case '1':
@@ -427,15 +441,34 @@ public:
 		case '5':
 			newBinaryTree->Size();
 			break;
+		case '6':
+			m_running = false;
+			break;
+		case '7':
+			newBinaryTree->AddNode(2);
+			newBinaryTree->AddNode(5);
+			newBinaryTree->AddNode(4);
+			verify(3, newBinaryTree->Size(), "Verifying size is 3");
+			newBinaryTree->AddNode(8);
+			verify(4, newBinaryTree->Size(),"Veryfying size is 4");
+			newBinaryTree->AddNode(1);
+			newBinaryTree->AddNode(3);
+			newBinaryTree->AddNode(3);
+			newBinaryTree->AddNode(7);
+			verify(7, newBinaryTree->Size(), "Veryfying size is 7, since 3 is already inserted");
+			newBinaryTree->TraverseInOrder();
+			newBinaryTree->TraversePostOrder();
+			break;
 		}
 		//system("pause");
 	}
 	void Update();
 	void InitializeList();
 	void InitializeBinaryTree();
-	TNode<int>* startNode;
 	TList<int>* newList;
 	TBinaryTree<int>* newBinaryTree;
+	bool treeInitialized;
+	bool listInitialized;
 private:
 	bool m_running;
 };

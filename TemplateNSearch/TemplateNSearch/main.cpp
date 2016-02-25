@@ -3,10 +3,12 @@
 #include "TemplateCity.h"
 int main(int argc, _TCHAR* argv[])
 {
-	TemplateCity templateCity;
-	if (templateCity.Initialize()){
-		templateCity.Update();
+	TemplateCity* templateCity=new TemplateCity;
+	if (templateCity->Initialize()){
+		templateCity->Update();
 	}
+	delete templateCity;
+	templateCity = nullptr;
 	return 0;
 }
 
